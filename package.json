@@ -1,0 +1,23 @@
+{
+  "name": "prive-certificates-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "mock:api": "node scripts/mock-api.mjs"
+  },
+  "dependencies": {
+    "@fontsource/great-vibes": "^5.1.0",
+    "@fontsource/inter": "^5.1.0",
+    "@fontsource/lora": "^5.1.0",
+    "@reduxjs/toolkit": "^2.13.0",
+    "next": "^15.0.3",
+    "qrcode": "^1.5.4",
+    "qrcode.react": "^4.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-redux": "^9.3.0"
+  }
+}

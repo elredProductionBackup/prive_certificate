@@ -1,0 +1,102 @@
+/* ------------------------------------------------------------------
+   Certificate artwork. Every size is in cqw (1% of the certificate width),
+   so it scales perfectly from a thumbnail to a 2267px PNG export.
+   Measurements were taken from the supplied 2267×1638 artwork.
+   ------------------------------------------------------------------ */
+.cert {
+  container-type: inline-size;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2267 / 1638;
+  background: #fff;
+  color: #111;
+  overflow: hidden;
+  text-align: center;
+}
+.cert__border { position: absolute; border: 0.13cqw solid #1f1f1f; pointer-events: none; }
+.cert__border--outer { inset: 2.12cqw; }
+.cert__border--inner { inset: 3.02cqw; }
+
+.cert__body {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center;
+  padding-top: 7.3cqw;
+}
+
+.cert__gold {
+  background: linear-gradient(180deg, #e6cf55 0%, #d4b43e 45%, #bf9028 100%);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+}
+
+.cert__brand { height: 5cqw; display: flex; align-items: baseline; justify-content: center; gap: 1.1cqw; line-height: 5cqw; }
+.cert__brand-name { font-family: "Lora", Georgia, serif; font-weight: 700; font-size: 4.5cqw; letter-spacing: -0.02em; }
+.cert__brand-team { font-family: "Lora", Georgia, serif; font-style: italic; font-weight: 400; font-size: 3cqw; }
+
+.cert__title {
+  font-family: "Great Vibes", cursive;
+  font-weight: 400;
+  font-size: 5.8cqw;
+  line-height: 6.75cqw;
+  max-width: 58cqw;
+  /* padding gives the gradient room to paint the swashes that hang outside the glyph box */
+  padding: 0 2cqw 1.2cqw;
+  margin: 1.7cqw 0 -1.2cqw;
+}
+
+.cert__speaker {
+  font-family: "Lora", Georgia, serif; font-weight: 700;
+  font-size: 4.3cqw; line-height: 5cqw; color: #54585c;
+  margin-top: 3.6cqw;
+}
+.cert__designation {
+  font-family: "Inter", Arial, sans-serif; font-style: italic; font-weight: 500;
+  font-size: 2.05cqw; line-height: 2.6cqw; margin-top: 0.3cqw;
+}
+.cert__presented {
+  font-family: "Inter", Arial, sans-serif; font-weight: 400;
+  font-size: 2.05cqw; line-height: 2.6cqw; margin-top: 1.4cqw;
+}
+.cert__recipient {
+  font-family: "Lora", Georgia, serif; font-weight: 400;
+  font-size: 4.3cqw; line-height: 5cqw; color: #54585c;
+  margin-top: 1.1cqw;
+  text-decoration: underline;
+  text-decoration-thickness: 0.2cqw;
+  text-underline-offset: 0.55cqw;
+  text-decoration-skip-ink: none;
+  max-width: 80cqw;
+  white-space: nowrap; overflow: visible;
+}
+.cert__recipient--empty { color: #b9b4a9; }
+.cert__citation {
+  font-family: "Inter", Arial, sans-serif; font-weight: 400;
+  font-size: 1.85cqw; line-height: 2cqw; max-width: 50cqw;
+  margin-top: 1.4cqw;
+}
+.cert__meta {
+  font-family: "Inter", Arial, sans-serif; font-weight: 400;
+  font-size: 1.85cqw; line-height: 2.45cqw; margin-top: 2.8cqw;
+}
+
+/* Verification strip: inside the inner border, bottom corners */
+.cert__verify {
+  position: absolute; left: 5cqw; right: 5cqw; bottom: 4.6cqw;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  font-family: "Inter", Arial, sans-serif; text-align: left; color: #6b6b6b;
+}
+.cert__verify-id { font-size: 1.05cqw; line-height: 1.5cqw; }
+.cert__verify-id strong { display: block; color: #3a3a3a; font-weight: 600; font-size: 1.25cqw; letter-spacing: 0.04em; }
+.cert__qr { width: 6.4cqw; height: 6.4cqw; }
+.cert__qr svg { width: 100%; height: 100%; display: block; }
+
+/* Revoked watermark */
+.cert__void {
+  position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+}
+.cert__void span {
+  font-family: "Inter", Arial, sans-serif; font-weight: 600;
+  font-size: 9cqw; letter-spacing: 0.08em; color: rgba(139, 46, 36, 0.16);
+  border: 0.5cqw solid rgba(139, 46, 36, 0.16); padding: 0.5cqw 3cqw;
+  transform: rotate(-18deg);
+}
