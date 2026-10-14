@@ -8,6 +8,7 @@ import "@fontsource/inter/latin-500.css";
 import "@fontsource/inter/latin-500-italic.css";
 import "@fontsource/inter/latin-600.css";
 import "./globals.css";
+import './range.css'
 import "./certificate.css";
 import StoreProvider from "@/store/StoreProvider";
 import Toaster from "@/components/common/Toaster";

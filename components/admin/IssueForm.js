@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CertificatePreview from "@/components/certificate/CertificatePreview";
 import Switch from "@/components/common/Switch";
@@ -9,6 +9,7 @@ import {
   setMode, setRecipientEmail, setRecipientName, setSendEmail,
 } from "@/store/slices/issueSlice";
 import { LIMITS, plural } from "@/lib/site";
+import { TITLE_WIDTH } from "@/lib/certificateCanvas";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SAMPLE_ID = "PRV-2026-XXXX-XXXX";
@@ -18,14 +19,20 @@ export default function IssueForm() {
   const issue = useSelector((s) => s.issue);
   const { mode, fields, recipientName, recipientEmail, batchText, sendEmail, running, progress, error } = issue;
 
+  const titleWidth = Number(fields.titleWidth) || TITLE_WIDTH.default;
+  const [widthDraft, setWidthDraft] = useState(null); // text in the % box while typing
+  const toFill = (v) => ((v - TITLE_WIDTH.min) / (TITLE_WIDTH.max - TITLE_WIDTH.min)) * 100;
+  const clampWidth = (v) => Math.min(TITLE_WIDTH.max, Math.max(TITLE_WIDTH.min, Math.round(Number(v)) || TITLE_WIDTH.default));
+
   const batch = useMemo(() => parseRecipients(batchText), [batchText]);
   const previewName = mode === "single" ? recipientName : batch[0]?.name || "";
   const previewCert = useMemo(
-    () => ({ ...fields, recipientName: previewName, certificateId: SAMPLE_ID, verifyUrl: "" }),
-    [fields, previewName]
+    () => ({ ...fields, titleWidth, recipientName: previewName, certificateId: SAMPLE_ID, verifyUrl: "" }),
+    [fields, titleWidth, previewName]
   );
 
   const set = (key) => (e) => dispatch(setField({ key, value: e.target.value }));
+  const setTitleWidth = (value) => dispatch(setField({ key: "titleWidth", value: Number(value) }));
 
   function validate() {
     const required = [["programTitle", "programme title"], ["speakerName", "speaker"], ["eventDate", "date"]];
@@ -106,6 +113,52 @@ export default function IssueForm() {
             <label htmlFor="ptitle">Programme title</label>
             <input id="ptitle" className="input" value={fields.programTitle} maxLength={LIMITS.programTitle} onChange={set("programTitle")} />
           </div>
+
+          <div className="field">
+            <div className="range-head">
+              <label htmlFor="twidth">Title width</label>
+              <span className="range-value">
+                <input type="number" inputMode="numeric" min={TITLE_WIDTH.min} max={TITLE_WIDTH.max} step={1}
+                  aria-label="Title width in percent"
+                  value={widthDraft ?? titleWidth}
+                  onChange={(e) => {
+                    setWidthDraft(e.target.value);
+                    const n = Number(e.target.value);
+                    if (n >= TITLE_WIDTH.min && n <= TITLE_WIDTH.max) setTitleWidth(Math.round(n));
+                  }}
+                  onBlur={(e) => { setTitleWidth(clampWidth(e.target.value)); setWidthDraft(null); }}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); e.currentTarget.blur(); } }} />
+                <span aria-hidden="true">%</span>
+              </span>
+            </div>
+
+            <div className="range" style={{ "--p": toFill(titleWidth), "--d": toFill(TITLE_WIDTH.default) }}>
+              <div className="range__track">
+                <input id="twidth" type="range" className="range__input"
+                  min={TITLE_WIDTH.min} max={TITLE_WIDTH.max} step={1} value={titleWidth}
+                  onChange={(e) => { setWidthDraft(null); setTitleWidth(e.target.value); }}
+                  aria-describedby="twidth-hint" aria-valuetext={`${titleWidth} percent`} />
+                <span className="range__tick" aria-hidden="true" />
+              </div>
+              <div className="range__scale" aria-hidden="true">
+                <span>{TITLE_WIDTH.min}%</span>
+                <span>{TITLE_WIDTH.max}%</span>
+              </div>
+            </div>
+
+            <span className="hint" id="twidth-hint">
+              How far across the certificate the title can run before it wraps. Wider means fewer lines. The mark on the track is the default, {TITLE_WIDTH.default}%.
+              {titleWidth !== TITLE_WIDTH.default && (
+                <>
+                  {" "}
+                  <button type="button" className="range-reset" onClick={() => { setWidthDraft(null); setTitleWidth(TITLE_WIDTH.default); }}>
+                    Reset
+                  </button>
+                </>
+              )}
+            </span>
+          </div>
+
           <div className="grid2">
             <div className="field">
               <label htmlFor="sname">Speaker</label>
