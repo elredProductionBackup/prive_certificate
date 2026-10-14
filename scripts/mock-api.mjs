@@ -1,8 +1,7 @@
 // Local stand-in for the Certification Portal API, following the API docs.
 // Run: npm run mock:api   then set NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
 // Sign-in code is always 123456 (999999 = expired code). Emails containing "fail"
-// get emailStatus "failed". A recipient name containing "reject" gets a 400.
-// Data lives in memory and is lost on restart.
+
 import http from "node:http";
 
 
