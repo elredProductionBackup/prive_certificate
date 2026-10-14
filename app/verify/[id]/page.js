@@ -10,6 +10,13 @@ import ResultActions, { CopyId } from "@/components/verify/ResultActions";
 import { lookupCertificate } from "@/store/slices/verifySlice";
 import { formatCheckedAt, formatLongDate, linkedInAddUrl, verifyLink } from "@/lib/site";
 
+// Overlaps shrink on phones so the dark hero band isn't mostly empty space.
+const OVERLAP = {
+  checking: "clamp(24px, 6vw, 40px)",
+  missing: "clamp(48px, 12vw, 96px)",
+  result: "clamp(56px, 16vw, 150px)",
+};
+
 export default function VerifyPage() {
   const params = useParams();
   const id = decodeURIComponent(String(params.id || "")).trim();
@@ -27,12 +34,14 @@ export default function VerifyPage() {
   /* ---------- checking ---------- */
   if (status === "loading" || status === "idle") {
     return (
-      <section className="v-band" style={{ "--overlap": "40px" }}>
+      <section className="v-band" style={{ "--overlap": OVERLAP.checking }}>
         <PublicBar />
         <div className="v-hero">
-          <div className="checking" role="status">
+          <div className="checking" role="status" aria-live="polite">
             <span className="spinner" />
-            <h1>Checking {id.toUpperCase()}</h1>
+            <h1>
+              Checking <span className="v-id">{id.toUpperCase()}</span>
+            </h1>
           </div>
         </div>
       </section>
@@ -47,17 +56,17 @@ export default function VerifyPage() {
       : { kicker: "Check unavailable", title: "We couldn't reach Privé's records" };
     return (
       <>
-        <section className="v-band" style={{ "--overlap": "96px" }}>
+        <section className="v-band" style={{ "--overlap": OVERLAP.missing }}>
           <PublicBar />
           <div className="v-hero">
             <div className="verdict">
               <Seal tone="unknown" label={copy.kicker} />
-              <div>
+              <div className="verdict__body">
                 <span className="verdict__kicker verdict__kicker--unknown"><i />{copy.kicker}</span>
                 <h1>{copy.title}</h1>
                 <p>
                   {notFound ? (
-                    <>There is no Privé certificate with the ID <strong>{id.toUpperCase()}</strong>. Check each character against the certificate and try again. If it still isn&rsquo;t found, the certificate was not issued by Privé.</>
+                    <>There is no Privé certificate with the ID <strong className="v-id">{id.toUpperCase()}</strong>. Check each character against the certificate and try again. If it still isn&rsquo;t found, the certificate was not issued by Privé.</>
                   ) : (
                     <>The verification service didn&rsquo;t respond. Try again in a minute.</>
                   )}
@@ -71,7 +80,7 @@ export default function VerifyPage() {
             </div>
           </div>
         </section>
-        <div style={{ padding: "0 20px 96px", "--overlap": "96px" }}>
+        <div className="v-after" style={{ "--overlap": OVERLAP.missing }}>
           <div className="plate rise">
             <div className="plate__inner"><VerifyForm initial={id} /></div>
           </div>
@@ -88,12 +97,12 @@ export default function VerifyPage() {
 
   return (
     <>
-      <section className="v-band" style={{ "--overlap": "150px" }}>
+      <section className="v-band" style={{ "--overlap": OVERLAP.result }}>
         <PublicBar />
         <div className="v-hero">
           <div className="verdict">
             <Seal tone={ok ? "valid" : "revoked"} label={ok ? "Verified" : "Revoked"} />
-            <div>
+            <div className="verdict__body">
               <span className={`verdict__kicker verdict__kicker--${ok ? "valid" : "revoked"}`}>
                 <i />{ok ? "Verified by Privé" : "Revoked by Privé"}
               </span>
@@ -109,12 +118,19 @@ export default function VerifyPage() {
         </div>
       </section>
 
-      <div className="result" style={{ "--overlap": "150px" }}>
+      <div className="result" style={{ "--overlap": OVERLAP.result }}>
         <div className="result__sheet rise print-area">
-          {ok && c.certificateImageUrl
-            ? /* eslint-disable-next-line @next/next/no-img-element */
-              <img className="result__img" src={c.certificateImageUrl} alt={`Certificate awarded to ${c.recipientName}`} />
-            : <Certificate cert={c} revoked={!ok} />}
+          {ok && c.certificateImageUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              className="result__img"
+              src={c.certificateImageUrl}
+              alt={`Certificate awarded to ${c.recipientName}`}
+              decoding="async"
+            />
+          ) : (
+            <Certificate cert={c} revoked={!ok} />
+          )}
         </div>
 
         <aside className="result__side rise" style={{ animationDelay: ".4s" }} aria-label="Certificate details">

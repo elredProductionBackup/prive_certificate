@@ -1,4 +1,5 @@
 import "../../verify.css";
+import "../../verify-mobile.css";
 
 export async function generateMetadata({ params }) {
   const { id } = await params;

@@ -1,0 +1,133 @@
+/* ===== Verify page: sizing + mobile =====
+   Import AFTER certificate.css so these rules win. */
+
+/* Certificate image renders at the same full width as the normal certificate */
+.result__img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+}
+
+/* Long certificate IDs never push the page sideways */
+.v-id,
+.checking h1,
+.verdict h1,
+.ledger dd {
+  overflow-wrap: anywhere;
+}
+
+.v-after {
+  padding: 0 20px 96px;
+}
+
+/* Footer logo matches the header logo */
+.site-footer__logo {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+/* ---------- tablets & phones ---------- */
+@media (max-width: 860px) {
+  .result {
+    display: flex !important;
+    flex-direction: column;
+    gap: 20px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+  .result__sheet,
+  .result__side {
+    width: 100% !important;
+    max-width: 100% !important;
+    position: static !important;
+  }
+}
+
+/* ---------- phones ---------- */
+@media (max-width: 600px) {
+  .v-bar__row {
+    gap: 10px;
+  }
+  .v-bar .logo {
+    height: 28px;
+    width: auto;
+  }
+  .v-bar__tag {
+    font-size: 12px;
+  }
+
+  .v-hero {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .verdict {
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .verdict__body {
+    min-width: 0;
+    width: 100%;
+  }
+  .verdict h1 {
+    font-size: clamp(26px, 7.5vw, 34px) !important;
+    line-height: 1.15 !important;
+  }
+  .verdict p {
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .verdict .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 46px;
+  }
+
+  .checking h1 {
+    font-size: 22px !important;
+    line-height: 1.25;
+  }
+
+  .v-after {
+    padding: 0 16px calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+  .plate__inner {
+    padding: 20px !important;
+  }
+
+  .result__side {
+    padding: 18px !important;
+  }
+  .ledger > div {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  /* Download / LinkedIn / share buttons: full width, easy to tap */
+  .result__side .btn,
+  .result__side button,
+  .result__side a.btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 46px;
+  }
+
+  .site-footer__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .site-footer__brand {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
