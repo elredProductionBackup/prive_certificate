@@ -34,7 +34,8 @@ html { scroll-behavior: smooth; }
   border-bottom: 1px solid rgba(235, 230, 221, .9);
 }
 .h-nav__inner { max-width: 1200px; margin: 0 auto; padding: 0 28px; height: 68px; display: flex; align-items: center; justify-content: space-between; }
-.h-brand { display: flex; align-items: baseline; gap: 12px; text-decoration: none; }
+.h-brand { display: flex;     align-items: flex-end;
+    justify-content: flex-end; gap: 12px; text-decoration: none; }
 .h-brand__word { font-family: "Lora", Georgia, serif; font-weight: 700; font-size: 26px; letter-spacing: -0.02em; color: var(--h-gold-ink); line-height: 1; }
 .h-brand__sub { font-size: 13.5px; color: var(--h-muted); padding-left: 12px; border-left: 1px solid var(--h-line); line-height: 1; }
 .h-nav__link { font-size: 14px; font-weight: 500; color: var(--h-ink); text-decoration: none; padding: 8px 14px; border-radius: 999px; transition: background .2s var(--ease); }

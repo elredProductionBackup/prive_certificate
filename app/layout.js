@@ -36,8 +36,8 @@ export default function RootLayout({ children }) {
                 className="site-footer__logo"
                 src={LOGO_URL}
                 alt="Privé"
-                height={28}
-                style={{ height: 28, width: "auto", maxWidth: 120, display: "block" }}
+                height={22}
+                style={{ height: 22, width: "auto", maxWidth: 120, display: "block" }}
               />
               <span>
                 Questions about a certificate? Write to{" "}

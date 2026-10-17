@@ -54,7 +54,7 @@
   }
   .v-bar .logo {
     height: 28px;
-    width: auto;
+    width: auto !important;
   }
   .v-bar__tag {
     font-size: 12px;

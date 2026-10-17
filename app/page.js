@@ -3,6 +3,7 @@ import VerifyForm from "@/components/verify/VerifyForm";
 import HeroCertificate from "@/components/home/HeroCertificate";
 import Faq from "@/components/home/Faq";
 import "./home.css";
+import { LOGO_URL } from "@/components/common/PublicBar"; 
 
 const Icon = {
   bolt: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M11 2L4 11h5l-1 7 7-9h-5l1-7z" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>,
@@ -16,7 +17,13 @@ export default function Home() {
       <header className="h-nav">
         <div className="h-nav__inner">
           <Link href="/" className="h-brand" aria-label="Privé certificate verification">
-            <span className="h-brand__word">Privé</span>
+                          <img
+                            className="site-footer__logo"
+                            src={LOGO_URL}
+                            alt="Privé"
+                            height={24}
+                            style={{ height: 24, width: "auto", maxWidth: 120, display: "block" }}
+                          />
             <span className="h-brand__sub">Certificate verification</span>
           </Link>
           <a href="#how" className="h-nav__link">How it works</a>
