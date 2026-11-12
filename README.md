@@ -56,7 +56,8 @@ store/
   listeners.js           401 -> sign out; save/clear the session in localStorage
   slices/                auth, otp, certificates, issue, verify, ui
 lib/
-  certificateCanvas.js   draws the certificate PNG in the browser
+  certificateCanvas.js   draws the certificate PNG in the browser (signatures included)
+  signatures.js          signature image clean-up, typed signatures, browser storage
   config.js              every env value
   session.js, site.js, download.js
 scripts/mock-api.mjs     local stand-in for the API
@@ -68,9 +69,21 @@ scripts/mock-api.mjs     local stand-in for the API
 - **Sessions**: the token is sent as `Authorization: Bearer …` and kept in localStorage, so a reload keeps you signed in (the profile is refreshed with `GET /profile`). Any admin call answering **401** (errorCode `1` or `-1`) signs the admin out, with a note on the sign-in page. Sign out deletes the token; there's no API call.
 - **OTP codes**: `5` selects the code to retype, `8` offers "Send a new code", `113`/`115` show the wait message. `sentTo: superAdmin` tells the person to ask the super admin.
 - **Issuing**, per person: `newId` → draw the canvas with the real ID and QR (`verifyUrl`) → `canvas.toBlob("image/png")` → multipart `POST /certificates`. A **409** gets a fresh ID and a redraw, up to 3 tries. "A list of people" repeats this one by one; anyone who fails stays in the box with the server's reason.
+- **Signatures** (optional, up to 3): drawn on the canvas, so they're inside the issued PNG and nothing extra goes to the API. See "Signatures" below.
 - **Email**: resend checks `emailStatus` in the response, since a failed send still answers 200. A changed address is sent as `recipientEmail` (saved, then sent).
 - **ZIP**: fetched with the token, saved through a temporary `<a download>`. Uses the table's current search and filters, or `ids` for a just-issued batch.
 - **Verify**: `track=1` is sent once per visit.
+
+## Signatures
+
+In the issue form, **+ Add signature** opens a dialog to upload the signature image (PNG, JPEG or WebP; a white or paper background is removed and it's cropped to the ink), or draw one (mouse, finger or pen), or type one in the script font. Each signature can have a name and title under its line, a size, and the line on or off. **Replace** and **Remove** (with Undo) are on each card.
+
+- **Placement**: with signatures, the date and location move to a right-hand column and the signatures sit side by side on the left, the line level with the date and the name with the location. Drag any of them on the preview (arrow keys nudge, Shift for bigger steps); **Reset positions** puts them back. If a signature covers text or the QR code, a note appears under the preview.
+- **No backend changes**: `issueSlice` passes `signatures` to `renderCertificatePng`, and `drawSignatures` in `lib/certificateCanvas.js` draws them last. Positions are stored in cqw, like the rest of the artwork.
+- **Kept in this browser** (`localStorage`, `prive.certPortal.signatures`) so a reload doesn't lose them; cleared on sign-out.
+- Certificates already issued keep whatever signatures they were issued with. The HTML artwork (`Certificate.js`, used for the home sample and revoked certificates) has no signatures, since the API doesn't store them.
+
+Files: `lib/signatures.js` (image clean-up, typed signatures, storage), `components/admin/SignaturesField.js` (the list), `components/admin/SignatureDialog.js` (draw / upload / type), `components/certificate/CertificatePreview.js` (dragging).
 
 ## Notes for the backend
 

@@ -157,3 +157,80 @@
 .confirm__actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .btn--danger-solid { background: var(--revoked); border-color: var(--revoked); color: #fff; }
 .btn--danger-solid:hover { background: #742419; }
+
+/* ---------------- Signatures (issue form) ---------------- */
+.sigs { gap: 10px; }
+.sigs__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.sigs__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.sigs__undo { margin: 0; font-family: var(--sans); font-size: 13px; color: var(--stone); }
+
+.sig-card {
+  display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 14px;
+  border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); padding: 12px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.sig-card.is-selected { border-color: var(--gilt); box-shadow: 0 0 0 3px rgba(169,127,40,.14); }
+.sig-card__thumb {
+  display: grid; place-items: center; height: 72px; border-radius: 6px;
+  background: #fff; border: 1px dashed #e2d7bf; padding: 6px;
+}
+.sig-card__thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.sig-card__body { display: grid; gap: 10px; min-width: 0; }
+.sig-card__body .field { gap: 4px; }
+.sig-card__body .field label { font-size: 12px; }
+.sig-card__row { display: flex; align-items: center; gap: 16px; }
+.sig-card__size { flex: 1; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px; min-width: 0; }
+.sig-card__size .label { font-size: 12px; }
+.sig-card__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.input--sm { font-size: 14px; padding: 8px 10px; }
+@media (max-width: 520px) {
+  .sig-card { grid-template-columns: 1fr; }
+}
+
+.check { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 13px; color: var(--ink); cursor: pointer; }
+.check input { width: 16px; height: 16px; accent-color: var(--gilt); margin: 0; }
+
+.cert-canvas--editable:focus-visible { outline: 3px solid rgba(169,127,40,.45); outline-offset: -3px; }
+
+/* ---------------- Signature dialog ---------------- */
+.modal--narrow { width: min(640px, calc(100vw - 32px)); }
+.modal--narrow h2 { font-size: 20px; }
+.sig-tab { display: grid; gap: 12px; }
+.sig-tab[hidden] { display: none; }
+
+.sigpad { display: grid; gap: 8px; }
+.sigpad__surface {
+  position: relative; aspect-ratio: 3 / 1; border: 1px solid #d8ccb2; border-radius: 8px;
+  background: #fff; overflow: hidden;
+}
+.sigpad__surface canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; z-index: 1; }
+.sigpad__guide { position: absolute; left: 8%; right: 8%; bottom: 24%; border-bottom: 1px dashed #d8ccb2; }
+.sigpad__placeholder {
+  position: absolute; left: 8%; bottom: calc(24% + 8px); font-family: var(--sans); font-size: 13px; color: #b9ae96;
+  pointer-events: none;
+}
+.sigpad__tools { display: flex; gap: 8px; justify-content: flex-end; }
+
+.ink { display: flex; gap: 8px; flex-wrap: wrap; }
+.ink__swatch {
+  display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 13px; font-weight: 600;
+  color: var(--stone); background: #fffdf8; border: 1px solid #d8ccb2; border-radius: 999px; padding: 5px 12px 5px 6px; cursor: pointer;
+}
+.ink__swatch span { width: 16px; height: 16px; border-radius: 50%; background: var(--ink); }
+.ink__swatch[aria-checked="true"] { border-color: var(--gilt); color: var(--ink); box-shadow: 0 0 0 2px rgba(169,127,40,.2); }
+
+.sig-drop {
+  display: grid; place-items: center; gap: 12px; min-height: 150px; padding: 18px; text-align: center;
+  border: 1.5px dashed #d8ccb2; border-radius: 8px;
+  /* checkerboard, so a transparent background is visible */
+  background: #fff repeating-conic-gradient(#f4efe3 0 25%, #fff 0 50%) 0 0 / 16px 16px;
+}
+.sig-drop.is-over { border-color: var(--gilt); background-color: #fbf6ea; }
+.sig-drop__img { max-width: 100%; max-height: 120px; object-fit: contain; }
+
+.sig-typed {
+  min-height: 92px; display: grid; place-items: center; padding: 8px 12px; overflow: hidden;
+  font-family: "Great Vibes", cursive; font-size: 54px; line-height: 1.2; white-space: nowrap;
+  border: 1px solid #d8ccb2; border-radius: 8px; background: #fff;
+}
+.sig-overlap { margin: 12px 0 0; font-size: 13px; padding: 10px 12px; }

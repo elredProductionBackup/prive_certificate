@@ -5,11 +5,12 @@
 //   2. draw the canvas in the browser -> PNG
 //   3. POST /certificates (multipart) -> stored and emailed
 // A 409 means someone used the ID first, so we ask for a new one and redraw.
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
 import { certificatesApi } from "@/services/certificatesApi";
 import { toPayload } from "@/services/apiClient";
 import { renderCertificatePng } from "@/lib/certificateCanvas";
 import { PROGRAMME_DEFAULTS, verifyLink } from "@/lib/site";
+import { MAX_SIGNATURES, SIGNATURE_SIZE } from "@/lib/signatures";
 import { fetchCertificates, setPage } from "./certificatesSlice";
 
 // "Name" or "Name, email@x.com" per line (commas, semicolons or tabs from Excel)
@@ -44,11 +45,12 @@ function buildForm(fields, recipient, certificateId, sendEmail, png) {
   return form;
 }
 
-async function issueOne(token, fields, recipient, sendEmail) {
+async function issueOne(token, fields, signatures, recipient, sendEmail) {
   for (let attempt = 1; ; attempt++) {
     const { certificateId, verifyUrl } = await certificatesApi.newId(token, fields.eventDate);
     const png = await renderCertificatePng({
       ...fields,
+      signatures, // drawn into the PNG only; nothing extra is sent to the API
       recipientName: recipient.name,
       certificateId,
       verifyUrl: verifyUrl || verifyLink(certificateId),
@@ -75,7 +77,7 @@ export const issueCertificates = createAsyncThunk("issue/run", async (_, { getSt
   for (const r of recipients) {
     dispatch(issueProgress({ current: r.name }));
     try {
-      const cert = await issueOne(auth.token, issue.fields, r, issue.sendEmail);
+      const cert = await issueOne(auth.token, issue.fields, issue.signatures, r, issue.sendEmail);
       issued.push(cert);
       dispatch(issueProgress({ issued: cert }));
     } catch (err) {
@@ -99,6 +101,8 @@ const initialState = {
   recipientEmail: "",
   batchText: "",
   sendEmail: true,
+  signatures: [], // see lib/signatures.js; same on every certificate in a run
+  signaturesRestored: false,
   running: false,
   progress: { done: 0, total: 0, current: "" },
   issued: [], // certificates from the last run
@@ -133,6 +137,38 @@ const issueSlice = createSlice({
       if (payload.failed) { state.failed.push(payload.failed); state.progress.done += 1; }
     },
     resetIssue() { return initialState; },
+
+    // Signatures. Only the issued PNG carries them, so these never touch the API.
+    restoreSignatures(state, { payload }) {
+      if (!state.signaturesRestored && state.signatures.length === 0) state.signatures = (payload || []).slice(0, MAX_SIGNATURES);
+      state.signaturesRestored = true;
+    },
+    addSignature: {
+      reducer(state, { payload }) {
+        if (state.signatures.length < MAX_SIGNATURES) state.signatures.push(payload);
+      },
+      prepare({ image, aspect, name = "", title = "" }) {
+        return {
+          payload: { id: nanoid(), image, aspect, name, title, size: SIGNATURE_SIZE.default, line: true, x: null, y: null },
+        };
+      },
+    },
+    updateSignature(state, { payload: { id, changes } }) {
+      const sig = state.signatures.find((s) => s.id === id);
+      if (sig) Object.assign(sig, changes);
+    },
+    removeSignature(state, { payload: id }) {
+      state.signatures = state.signatures.filter((s) => s.id !== id);
+    },
+    // Undo for a removal: puts the same signature back where it was
+    reinsertSignature(state, { payload: { signature, index } }) {
+      if (state.signatures.length >= MAX_SIGNATURES || state.signatures.some((s) => s.id === signature.id)) return;
+      state.signatures.splice(Math.min(index, state.signatures.length), 0, signature);
+    },
+    // Back to the automatic places (undoes any dragging)
+    autoPlaceSignatures(state) {
+      state.signatures.forEach((s) => { s.x = null; s.y = null; });
+    },
   },
   extraReducers: (b) => {
     b.addCase(issueCertificates.fulfilled, (s) => {
@@ -155,6 +191,7 @@ const issueSlice = createSlice({
 export const {
   setMode, setField, setRecipientName, setRecipientEmail, setBatchText, setSendEmail,
   setIssueError, dismissResults, issueStarted, issueProgress, resetIssue,
+  restoreSignatures, addSignature, updateSignature, removeSignature, reinsertSignature, autoPlaceSignatures,
 } = issueSlice.actions;
 
 export default issueSlice.reducer;

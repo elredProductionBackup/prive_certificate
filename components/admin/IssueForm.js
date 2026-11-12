@@ -4,9 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import CertificatePreview from "@/components/certificate/CertificatePreview";
 import Switch from "@/components/common/Switch";
 import IssueResults from "./IssueResults";
+import SignaturesField from "./SignaturesField";
 import {
   issueCertificates, parseRecipients, setBatchText, setField, setIssueError,
-  setMode, setRecipientEmail, setRecipientName, setSendEmail,
+  setMode, setRecipientEmail, setRecipientName, setSendEmail, updateSignature,
 } from "@/store/slices/issueSlice";
 import { LIMITS, plural } from "@/lib/site";
 import { TITLE_WIDTH } from "@/lib/certificateCanvas";
@@ -17,7 +18,9 @@ const SAMPLE_ID = "PRV-2026-XXXX-XXXX";
 export default function IssueForm() {
   const dispatch = useDispatch();
   const issue = useSelector((s) => s.issue);
-  const { mode, fields, recipientName, recipientEmail, batchText, sendEmail, running, progress, error } = issue;
+  const { mode, fields, recipientName, recipientEmail, batchText, sendEmail, signatures, running, progress, error } = issue;
+  const [selectedSig, setSelectedSig] = useState(null); // highlighted in the list and on the preview
+  const [sigOverlap, setSigOverlap] = useState(false); // a signature covers text or the QR code
 
   const titleWidth = Number(fields.titleWidth) || TITLE_WIDTH.default;
   const [widthDraft, setWidthDraft] = useState(null); // text in the % box while typing
@@ -27,9 +30,10 @@ export default function IssueForm() {
   const batch = useMemo(() => parseRecipients(batchText), [batchText]);
   const previewName = mode === "single" ? recipientName : batch[0]?.name || "";
   const previewCert = useMemo(
-    () => ({ ...fields, titleWidth, recipientName: previewName, certificateId: SAMPLE_ID, verifyUrl: "" }),
-    [fields, titleWidth, previewName]
+    () => ({ ...fields, titleWidth, recipientName: previewName, signatures, certificateId: SAMPLE_ID, verifyUrl: "" }),
+    [fields, titleWidth, previewName, signatures]
   );
+  const moveSignature = (id, pos) => { if (!running) dispatch(updateSignature({ id, changes: pos })); };
 
   const set = (key) => (e) => dispatch(setField({ key, value: e.target.value }));
   const setTitleWidth = (value) => dispatch(setField({ key: "titleWidth", value: Number(value) }));
@@ -189,6 +193,8 @@ export default function IssueForm() {
               <input id="loc" className="input" value={fields.location} maxLength={LIMITS.location} onChange={set("location")} />
             </div>
           </div>
+
+          <SignaturesField selectedId={selectedSig} onSelect={setSelectedSig} />
         </fieldset>
 
         <Switch id="send-email" checked={sendEmail} onChange={(v) => dispatch(setSendEmail(v))}
@@ -222,10 +228,17 @@ export default function IssueForm() {
       <div className="issue__preview" aria-label="Live preview">
         <p className="label" style={{ margin: "0 0 10px" }}>Preview</p>
         <div className="issue__sheet">
-          <CertificatePreview cert={previewCert} />
+          <CertificatePreview cert={previewCert} selectedSignatureId={selectedSig}
+            onSelectSignature={setSelectedSig} onMoveSignature={moveSignature} onOverlapChange={setSigOverlap} />
         </div>
+        {signatures.length > 0 && sigOverlap && (
+          <p className="alert alert--info sig-overlap" role="status">
+            A signature is covering other text. Drag it to a clear spot, make it smaller, or shorten the title.
+          </p>
+        )}
         <p className="hint" style={{ marginTop: 10 }}>
           This is the image that gets issued. The real ID and QR code are added when you issue.
+          {signatures.length > 0 && " Drag a signature to move it; the dashed frame only shows here."}
         </p>
       </div>
     </section>

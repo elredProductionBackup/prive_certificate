@@ -19,10 +19,12 @@ function CertificateDialog({ cert }) {
   const [copied, setCopied] = useState(false);
   const [confirming, setConfirming] = useState(false);
 
+  // Open as a modal. No close() on cleanup: in development React mounts effects
+  // twice, and that close() fires a "close" event that shut the dialog straight
+  // away (rows looked unclickable under `npm run dev`). Unmounting removes it anyway.
   useEffect(() => {
     const d = dialogRef.current;
-    d?.showModal();
-    return () => d?.close();
+    if (d && !d.open) d.showModal();
   }, []);
 
   const close = () => dispatch(closeCertificate());
