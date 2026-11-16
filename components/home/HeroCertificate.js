@@ -76,8 +76,8 @@ export default function HeroCertificate() {
       </div>
 
       <div className="hc__legend">
-        <span><i className="hc__dot" /> Certificate ID, bottom left</span>
-        <span><i className="hc__dot" /> QR code, bottom right</span>
+        <span><i className="hc__dot" /> Certificate ID, bottom right</span>
+        <span><i className="hc__dot" /> QR code, in the corner</span>
       </div>
     </div>
   );

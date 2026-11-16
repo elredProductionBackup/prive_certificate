@@ -20,7 +20,7 @@ export default function VerifyForm({ initial = "", autoFocus = false }) {
   function onSubmit(e) {
     e.preventDefault();
     if (chars < 12) {
-      setError(`That's ${chars} of 12 characters. Copy the full ID from the bottom-left corner of the certificate.`);
+      setError(`That's ${chars} of 12 characters. Copy the full ID from the bottom-right corner of the certificate, next to the QR code.`);
       return;
     }
     setError("");

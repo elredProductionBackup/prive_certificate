@@ -78,6 +78,12 @@ scripts/mock-api.mjs     local stand-in for the API
 
 In the issue form, **+ Add signature** opens a dialog to upload the signature image (PNG, JPEG or WebP; a white or paper background is removed and it's cropped to the ink), or draw one (mouse, finger or pen), or type one in the script font. Each signature can have a name and title under its line, a size, and the line on or off. **Replace** and **Remove** (with Undo) are on each card.
 
+The speaker and the signatures share the bottom-left corner of the certificate. The Speaker field can be left blank when the speaker signs: the first signature with a name then stands in for the speaker (on the certificate, in the API record and on LinkedIn). A signature takes the speaker's place, with the speaker's name and title printed under its line, when its name matches the speaker's name, or when it's the first signature and has no name or title. Otherwise the speaker gets their own block (a short gold bar, name and title) first in the row, and each signature follows with its own name and title. Dragged signatures keep their position.
+
+## Certificate design
+
+`lib/certificateCanvas.js` (the issued PNG) and `components/certificate/Certificate.js` + `app/certificate.css` (the HTML version) draw the same layout from the same cqw numbers: cream paper with a fine grain (`public/brand/paper.png`), a faint gold guilloche behind the text (`public/brand/guilloche.svg`) and a gold double frame; a left-aligned column with the logo, a gold rule, "Presents to", the recipient, the citation, the programme title and "date · location"; the speaker and signatures bottom left; the Certificate ID and QR code bottom right.
+
 - **Placement**: with signatures, the date and location move to a right-hand column and the signatures sit side by side on the left, the line level with the date and the name with the location. Drag any of them on the preview (arrow keys nudge, Shift for bigger steps); **Reset positions** puts them back. If a signature covers text or the QR code, a note appears under the preview.
 - **No backend changes**: `issueSlice` passes `signatures` to `renderCertificatePng`, and `drawSignatures` in `lib/certificateCanvas.js` draws them last. Positions are stored in cqw, like the rest of the artwork.
 - **Kept in this browser** (`localStorage`, `prive.certPortal.signatures`) so a reload doesn't lose them; cleared on sign-out.

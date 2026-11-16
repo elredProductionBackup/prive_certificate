@@ -66,7 +66,7 @@ export default function Home() {
             </div>
             <span className="step__num">1</span>
             <h3>Find the ID</h3>
-            <p>It&rsquo;s printed in the bottom-left corner of the certificate and starts with PRV.</p>
+            <p>It&rsquo;s printed in the bottom-right corner of the certificate, next to the QR code, and starts with PRV.</p>
           </li>
           <li className="step">
             <div className="step__visual">

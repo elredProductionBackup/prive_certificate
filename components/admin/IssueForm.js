@@ -11,6 +11,7 @@ import {
 } from "@/store/slices/issueSlice";
 import { LIMITS, plural } from "@/lib/site";
 import { TITLE_WIDTH } from "@/lib/certificateCanvas";
+import { withSignatureSpeaker } from "@/lib/signatures";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SAMPLE_ID = "PRV-2026-XXXX-XXXX";
@@ -30,7 +31,7 @@ export default function IssueForm() {
   const batch = useMemo(() => parseRecipients(batchText), [batchText]);
   const previewName = mode === "single" ? recipientName : batch[0]?.name || "";
   const previewCert = useMemo(
-    () => ({ ...fields, titleWidth, recipientName: previewName, signatures, certificateId: SAMPLE_ID, verifyUrl: "" }),
+    () => ({ ...withSignatureSpeaker(fields, signatures), titleWidth, recipientName: previewName, signatures, certificateId: SAMPLE_ID, verifyUrl: "" }),
     [fields, titleWidth, previewName, signatures]
   );
   const moveSignature = (id, pos) => { if (!running) dispatch(updateSignature({ id, changes: pos })); };
@@ -39,8 +40,12 @@ export default function IssueForm() {
   const setTitleWidth = (value) => dispatch(setField({ key: "titleWidth", value: Number(value) }));
 
   function validate() {
-    const required = [["programTitle", "programme title"], ["speakerName", "speaker"], ["eventDate", "date"]];
+    const required = [["programTitle", "programme title"], ["eventDate", "date"]];
     for (const [k, label] of required) if (!String(fields[k] || "").trim()) return `Add the ${label}.`;
+    // The speaker can be typed in, or sign: a signature with a name stands in for them
+    if (!String(withSignatureSpeaker(fields, signatures).speakerName || "").trim()) {
+      return "Add the speaker, or a signature with the speaker's name.";
+    }
     if (mode === "single") {
       if (!recipientName.trim()) return "Add the recipient's name.";
       if (recipientEmail.trim() && !EMAIL_RE.test(recipientEmail.trim())) return "That email address doesn't look right.";
@@ -61,6 +66,7 @@ export default function IssueForm() {
     dispatch(issueCertificates());
   }
 
+  const speakerShown = withSignatureSpeaker(fields, signatures).speakerName;
   const count = mode === "single" ? 1 : batch.length;
   const pct = progress.total ? Math.round((progress.done / progress.total) * 100) : 0;
 
@@ -166,7 +172,9 @@ export default function IssueForm() {
           <div className="grid2">
             <div className="field">
               <label htmlFor="sname">Speaker</label>
-              <input id="sname" className="input" value={fields.speakerName} maxLength={LIMITS.speakerName} onChange={set("speakerName")} />
+              <input id="sname" className="input" value={fields.speakerName} maxLength={LIMITS.speakerName} onChange={set("speakerName")}
+                placeholder={withSignatureSpeaker(fields, signatures).speakerName || ""} aria-describedby="sname-hint" />
+              <span className="hint" id="sname-hint">Leave blank when the speaker signs: the signature&rsquo;s name and title are used.</span>
             </div>
             <div className="field">
               <label htmlFor="stitle">Speaker&rsquo;s title</label>
@@ -176,7 +184,7 @@ export default function IssueForm() {
           <div className="field">
             <label htmlFor="cred">Name on LinkedIn</label>
             <input id="cred" className="input" value={fields.credentialName} maxLength={LIMITS.credentialName} onChange={set("credentialName")}
-              placeholder={fields.speakerName ? `Completed Workshop by ${fields.speakerName}` : ""} />
+              placeholder={speakerShown ? `Completed Workshop by ${speakerShown}` : ""} />
             <span className="hint">What the email&rsquo;s &ldquo;Add to LinkedIn&rdquo; button fills in as the certification name.</span>
           </div>
           <div className="field">

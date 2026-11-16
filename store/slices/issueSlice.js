@@ -10,7 +10,7 @@ import { certificatesApi } from "@/services/certificatesApi";
 import { toPayload } from "@/services/apiClient";
 import { renderCertificatePng } from "@/lib/certificateCanvas";
 import { PROGRAMME_DEFAULTS, verifyLink } from "@/lib/site";
-import { MAX_SIGNATURES, SIGNATURE_SIZE } from "@/lib/signatures";
+import { MAX_SIGNATURES, SIGNATURE_SIZE, withSignatureSpeaker } from "@/lib/signatures";
 import { fetchCertificates, setPage } from "./certificatesSlice";
 
 // "Name" or "Name, email@x.com" per line (commas, semicolons or tabs from Excel)
@@ -45,7 +45,8 @@ function buildForm(fields, recipient, certificateId, sendEmail, png) {
   return form;
 }
 
-async function issueOne(token, fields, signatures, recipient, sendEmail) {
+async function issueOne(token, formFields, signatures, recipient, sendEmail) {
+  const fields = withSignatureSpeaker(formFields, signatures); // a signing speaker needs no Speaker field
   for (let attempt = 1; ; attempt++) {
     const { certificateId, verifyUrl } = await certificatesApi.newId(token, fields.eventDate);
     const png = await renderCertificatePng({
